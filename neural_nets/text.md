@@ -6,7 +6,6 @@ bibliography: neural_nets.bib
 link-citations: true
 lang: russian
 mainfont: "Georgia"
-theme: "cerulean"
 ---
 
 NB: всё далее изложенное -- черновик черновика текста доклада, здесь могут быть принципиально неверные утверждения и фактические ошибки.
@@ -90,7 +89,11 @@ $$\frac{\partial J}{\partial w_{ij}^l} = \frac{\partial J}{\partial a_i^l} \cdot
 
 ## Примеры неглубоких сетей
 ### Autoencoder
+[wiki](https://ru.wikipedia.org/wiki/Автокодировщик) -- здесь есть ещё хорошая картинка для презентации
+
+[tutorial with lots of info](https://blog.keras.io/building-autoencoders-in-keras.html) -- хорошее введение с примерами приложений и бесполезностей
 ### Word2Vec
+[Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/abs/1301.3781)
 
 ## Проблемы
 Нейросети требовательны к объёму памяти и скорости вычислений, не очень хорошо параллелятся и т.д. 
