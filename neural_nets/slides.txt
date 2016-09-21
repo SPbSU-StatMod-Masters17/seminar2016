@@ -1,0 +1,108 @@
+---
+title: |
+    Нейронные сети: принципы, проблемы, что работает, что нет и почему.
+author: Анастасия Миллер
+bibliography: neural_nets.bib
+link-citations: true
+lang: russian
+mainfont: "Times New Roman"
+---
+
+# Архитектура полносвязной сети
+
+![изображение абстрактной нейронной сети](abstract_net_example.png)
+
+# Активационные функции
+
+![common types of neurons](neurons.pdf)
+
+# Естественный нейрон
+
+![neuron cell](neuron_cell.png)
+
+# Модель МакКаллока-Питтса
+$$a(x_ 1, … x_ {n_ {l-1}}) = \mathrm{sign} (\sum x_ i + b),$$
+где $x_i$ — значения входов для этого нейрона.
+
+Многослойный перцептрон:
+$$a^l_ i = a^l_ i \left(\sum_j w^l_ {ij} a^{l-1}_j\right)$$
+
+# Задача оптимизации
+
+$\exists f: \mathbb{R}^N \to \mathbb{R}^k$
+
+- часто даже вид $f$ неизвестен
+- известны значения $f$ на конечном наборе точек $\left\{ x_i \right\}_{i=1}^N \in \mathbb{R}^k$ --- $\left\{ y_i \right\}_{i=1}^N \in \mathbb{R}^m$
+- хотим построить равномерное приближение $f$ быстро вычислимой функцией $f$: $$\mathrm{arg\,min}_{g\in F} \mathrm{dist}(g, f)$$
+
+# Наивное решение
+
+\begin{theorem}[Вейерштрасс]
+$\forall f: \mathbb{R}^n \to Q$, где $Q$ -- замкнутое ограниченное множество, $\forall \varepsilon > 0$ существует такой многочлен $P(x_1, \ldots, x_n):$
+$$\mathrm{sup}_Q\left\vert f(x_1, \ldots, x_n) - P(x_1, \ldots, x_n) \right\vert < \varepsilon$$
+\end{theorem}
+
+# Нейронная сеть -- универсальный аппроксиматор
+
+\begin{definition}
+Набор функций $F \subset C(X)$ называется замкнутым относительно функции $\phi : \mathbb{R} \to \mathbb{R}$, если для любого $f \in F$ выполнено $\phi(f) \in F$. 
+\end{definition}
+
+\begin{theorem}[Горбань, 1998]
+Пусть $X$ — компактное пространство, $C(X)$ — алгебра непрерывных на $X$ вещественных функций, $F$ — линейное подпространство в $C(X)$, замкнутое относительно нелинейной непрерывной функции $\phi$, содержащее константу ($1 \in F$) и разделяющее точки множества $X$. Тогда $F$ плотно в $C(X)$. 
+\end{theorem}
+
+# Задача настройки весов сети
+Хотим найти набор весов 
+$$\{w_{ij}^l\} = \mathrm{arg\,min}_{\{w_{ij}^l\}} J\left(f, a\left(\left\{w_{ij}^l\right\}\right)\right),$$ 
+где $J$ -- функция, измеряющая расстояние между $f$ и $a\left(\left\{w_{ij}^l\right\}\right)$.
+
+## Примеры $J$
+Всего $N$ примеров, правильные ответы $y_i = (y_i^1, \ldots, y_i^K) \in \mathbb{R}^K$, ответ сети для $i$-го примера -- $\hat y_i \in \mathbb{R}^K$
+
+- $\frac{1}{N}\sum_{i=1}^N \left\Vert \hat y_i - y_i \right\Vert ^2$ --- MSE
+- $-\frac{1}{N}\sum_{k=1}^N \sum_{i=1}^K \left(y^i_k \ln \hat y^i_k + (1 - y^i_k)\ln(1 - \hat y^i_k) \right)$ --- log-likelihood cross-entropy
+
+# Метод градиентного спуска
+1. Задача: найти $\mathrm{arg\,min}_ X F(x)$. Решение: $x_{n+1} = x_n - \lambda_n \nabla F(x_n)$
+2. Для $J(\theta) = \frac{1}{2}\cdot\frac{1}{N}\sum_{k=1}^N \left\Vert \hat y_k - y_k \right\Vert ^2$
+производная будет выглядеть как 
+$$\frac{\partial J}{\partial w_{ij}^l} = \frac{1}{N} \sum_{k=1}^N \sum_{i=1}^{n_L}\frac{\partial}{\partial w_{ij}^l} \left( \hat y_{ki} - y_{ki} \right) \text{---}$$ $O(\left\vert W\right\vert \cdot N)$, где $\left\vert W\right\vert$ -- число настраиваемых параметров.
+3. SGD: $g^n$ -- стохастический градиент $J$ на $n$-м шаге \begin{theorem}
+Если $g^n$ ограничен, $-g^n$ в среднем указывает в сторону минимума и $g^n$ отделён от нуля не в точке оптимума, то стохастический градиентный спуск сойдётся к оптимальному значению.
+\end{theorem}
+
+# Алгоритм обратного распространения ошибки
+
+Для каждого параметра $w_ {ij}^l$ нужно посчитать 
+$$\frac{\partial J}{\partial w_{ij}^l} = \frac{\partial J}{\partial a_i^l} \cdot \frac{\mathrm{d} a_i^l}{\mathrm{d} x} a^{l-1}_j.$$ 
+
+$$\frac{\partial J}{\partial a^l_i} = \sum_{m=1}^{n_{l+1}} \frac{\partial J}{\partial a^{l+1}_m}\cdot\frac{\mathrm{d} a^{l+1}_m}{\mathrm{d} x} w^{l+1}_{mj}.$$
+
+Изложенное выше не включает в себя векторизацию, после которой формулы становятся красивее, но которая утомительнее в выписывании.
+
+Подробное изложение с векторизацией см. в [@Nielsen2015]
+
+# Примеры неглубоких сетей
+
+## Autoencoder
+
+![схема автокодировщика](autoencoder.png)
+
+<!-- ## Word2Vec
+[Efficient Estimation of Word Representations in Vector Space](https://arxiv.org/abs/1301.3781)
+[Tutorial with net scheme and more on embeddings themselves](https://www.tensorflow.org/versions/r0.10/tutorials/word2vec/index.html)
+ -->
+# Проблемы
+
+- Нейросети требовательны к объёму памяти и скорости вычислений, не очень хорошо параллелятся и т.д. 
+- При увеличении количества слоёв появляются проблемы с “размазыванием” градиента и с точностью вычислений.
+- Не все данные представимы конечным разумным числом входов (см. “Картинки с большим разрешением”, “текстовые последовательности”).
+- Не гарантируется скорость сходимости, поэтому хочется задавать априорную информацию о структуре взаимоотношений между входами.
+
+# Решения
+
+## Convolutional neural networks
+![CNN architecture](cnn.png)
+
+# Литература
