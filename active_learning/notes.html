@@ -416,8 +416,10 @@ pre.editor-colors .bracket-matcher .region,
 <p><em>Активное обучение</em> решает задачи обучения с учителем, используя дополнительно <em>неразмеченные</em> данные, то есть объекты, для которых неизвестен ответ (класс, метка, значение целевой функции на этом объекте).</p>
 <p>Предположим, что в нашей конкретной задаче обучения с учителем есть некоторая функция, которая сопоставляет ответ любому объекту из неразмеченных данных, но при этом является дорогостоящей процедурой (достаточно дорогой, чтобы не обращаться к ней постоянно). Будем называть ее <em>оракулом</em>. Тогда основная идея активного обучения — выбирать объекты среди неразмеченных данных, которые помогут <em>быстрее обучить модель</em>, и тем самым минимизировать кол-во вызовов оракула.</p>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/al.png?v=1480851541656" width="640"></p>
-<em><strong>Рис. 1: Схема активного обучения (семплирование из пула)</strong></em>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/al.png?v=1480851541656" alt="&#x420;&#x438;&#x441;. 1: &#x421;&#x445;&#x435;&#x43C;&#x430; &#x430;&#x43A;&#x442;&#x438;&#x432;&#x43D;&#x43E;&#x433;&#x43E; &#x43E;&#x431;&#x443;&#x447;&#x435;&#x43D;&#x438;&#x44F; (&#x441;&#x435;&#x43C;&#x43F;&#x43B;&#x438;&#x440;&#x43E;&#x432;&#x430;&#x43D;&#x438;&#x435; &#x438;&#x437; &#x43F;&#x443;&#x43B;&#x430;)" id="id" class="class" width="640">
+<p class="caption">Рис. 1: Схема активного обучения (семплирование из пула)</p>
+</div>
 </center>
 <p>Активное обучение применяется в любой области, где построение обучающей выборки затратная процедура. Если вы занимаетесь классификацией текстов, изображений и т.п., найти неразмеченные данные не составляет труда. Но готовые размеченные датасетами, которые подходят под вашу задачу, найти сложнее, приходится размечать самому, или просить друзей, или обращаться в специальные сервисы (Яндекс.Толока, Amazon Mechanical Turk). Друзей сильно мучить не хочется, а сервисам нужно платить, поэтому здесь пригодится активное обучение.</p>
 <h4 id="&#x43F;&#x43E;&#x447;&#x435;&#x43C;&#x443;-&#x44D;&#x442;&#x43E;-&#x440;&#x430;&#x431;&#x43E;&#x442;&#x430;&#x435;&#x442;">Почему это работает?</h4>
@@ -425,18 +427,24 @@ pre.editor-colors .bracket-matcher .region,
 <p><em><strong>Пример 1.</strong></em> Дана функция <span class="math"><script type="math/tex">g(x, \theta) = \mathbb{I}_{x > \theta}(x),\, x \in [0, 1],\, \theta \in [0, 1]</script></span>, и нужно оценить <span class="math"><script type="math/tex">\theta</script></span>, при условии, что мы можем вычислять <span class="math"><script type="math/tex">g(x, \theta)</script></span> в произвольных точках <span class="math"><script type="math/tex">x</script></span>, но процедура эта крайне дорогая, и кол-во вызовов хочется сделать как можно меньше.</p>
 <p>Наивный подход — взять для разметки равномерную сетку <span class="math"><script type="math/tex">\{i/n\},\, i = 1,\ldots, n - 1</script></span>. Оценка по времени этого решения — <span class="math"><script type="math/tex">O(n)</script></span> измерений.</p>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/naive.png?v=1480851541657" width="400"></p>
-<em><strong>Рис. 2: Задача линейного разделения. Наивный подход</strong></em>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/naive.png?v=1480851541657" alt="&#x420;&#x438;&#x441;. 2: &#x417;&#x430;&#x434;&#x430;&#x447;&#x430; &#x43B;&#x438;&#x43D;&#x435;&#x439;&#x43D;&#x43E;&#x433;&#x43E; &#x440;&#x430;&#x437;&#x434;&#x435;&#x43B;&#x435;&#x43D;&#x438;&#x44F;. &#x41D;&#x430;&#x438;&#x432;&#x43D;&#x44B;&#x439; &#x43F;&#x43E;&#x434;&#x445;&#x43E;&#x434;" id="id" class="class" width="400">
+<p class="caption">Рис. 2: Задача линейного разделения. Наивный подход</p>
+</div>
 </center>
 <p>Но быстрее эта задача решается двоичными поиском, временная сложность которого <span class="math"><script type="math/tex">O(\log n)</script></span>.</p>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/bs.png?v=1480851541657" width="405"></p>
-<p><em><strong>Рис. 3: Задача линейного разделения. Двоичный поиск</strong></em></p>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/bs.png?v=1480851541657" alt="&#x420;&#x438;&#x441;. 3: &#x417;&#x430;&#x434;&#x430;&#x447;&#x430; &#x43B;&#x438;&#x43D;&#x435;&#x439;&#x43D;&#x43E;&#x433;&#x43E; &#x440;&#x430;&#x437;&#x434;&#x435;&#x43B;&#x435;&#x43D;&#x438;&#x44F;. &#x414;&#x432;&#x43E;&#x438;&#x447;&#x43D;&#x44B;&#x439; &#x43F;&#x43E;&#x438;&#x441;&#x43A;" id="id" class="class" width="405">
+<p class="caption">Рис. 3: Задача линейного разделения. Двоичный поиск</p>
+</div>
 </center>
 <em><strong>Пример 2.</strong></em> Теперь рассмотрим пример, где сравниваются результаты классификации с помощью логистической регрессии и ее комбинации с активным обучением.
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/example.png?v=1480851541658" width="660"></p>
-<p><em><strong>Рис. 4: Пример работы обычной логистической регрессии (b) и логистической регрессии с активным обучением (с)</strong></em></p>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/example.png?v=1480851541658" alt="&#x420;&#x438;&#x441;. 4: &#x41F;&#x440;&#x438;&#x43C;&#x435;&#x440; &#x440;&#x430;&#x431;&#x43E;&#x442;&#x44B; &#x43E;&#x431;&#x44B;&#x447;&#x43D;&#x43E;&#x439; &#x43B;&#x43E;&#x433;&#x438;&#x441;&#x442;&#x438;&#x447;&#x435;&#x441;&#x43A;&#x43E;&#x439; &#x440;&#x435;&#x433;&#x440;&#x435;&#x441;&#x441;&#x438;&#x438; (b) &#x438; &#x43B;&#x43E;&#x433;&#x438;&#x441;&#x442;&#x438;&#x447;&#x435;&#x441;&#x43A;&#x43E;&#x439; &#x440;&#x435;&#x433;&#x440;&#x435;&#x441;&#x441;&#x438;&#x438; &#x441; &#x430;&#x43A;&#x442;&#x438;&#x432;&#x43D;&#x44B;&#x43C; &#x43E;&#x431;&#x443;&#x447;&#x435;&#x43D;&#x438;&#x435;&#x43C; (&#x441;)" id="id" class="class" width="660">
+<p class="caption">Рис. 4: Пример работы обычной логистической регрессии (b) и логистической регрессии с активным обучением (с)</p>
+</div>
 </center>
 <p>На подграфике (a) изображены 400 точек, относящихся к одной из двух меток, сгенерированных из двух различных двумерных гауссовских распределений с одинаковой дисперисией (по 200 из каждого распределения).</p>
 <p>На подграфике (b) изображена разделящая прямая, построенная логистической регрессией по 30 точкам, выбранных н.о.р. из пула всех данных. Точность классификации 70%. На следующем графике изображена разделящая прямая, построенная логистической регрессией с активным обучением по 30 точкам, выбранных по степени неуверенности. Точность классификации 90%.</p>
@@ -471,8 +479,10 @@ pre.editor-colors .bracket-matcher .region,
 </ol>
 <p>Ниже на тепловых картах сравниваются значения функционалов-эвристик a)-с) (обратите внимание, что тепловые шкалы на трех графиках разные). Объекты, относительно которых модель больше всего неуверена, находятся в центре, так как для них все апостериорные вероятности <span class="math"><script type="math/tex">P_{\theta}(y_i|x)</script></span> примерно равны. Объекты, находящиеся ближе к углам, считаются менее информативными, так как модель больше всего уверена в предсказанным для них меткам.</p>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/um.png?v=1480851541658" width="700"></p>
-<em><strong>Рис. 5: Тепловые карты различных <span class="math"><script type="math/tex">\varphi_k(x)</script></span> в случае трех классов. Синяя область — наименее информативные объекты, красная область — наиболее информативные объекты согласно данной стратегии</strong></em>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/um.png?v=1480851541658" alt="&#x420;&#x438;&#x441;. 5: &#x422;&#x435;&#x43F;&#x43B;&#x43E;&#x432;&#x44B;&#x435; &#x43A;&#x430;&#x440;&#x442;&#x44B; &#x440;&#x430;&#x437;&#x43B;&#x438;&#x447;&#x43D;&#x44B;&#x445; \varphi_k(x) &#x432; &#x441;&#x43B;&#x443;&#x447;&#x430;&#x435; &#x442;&#x440;&#x435;&#x445; &#x43A;&#x43B;&#x430;&#x441;&#x441;&#x43E;&#x432;. &#x421;&#x438;&#x43D;&#x44F;&#x44F; &#x43E;&#x431;&#x43B;&#x430;&#x441;&#x442;&#x44C; &#x2014; &#x43D;&#x430;&#x438;&#x43C;&#x435;&#x43D;&#x435;&#x435; &#x438;&#x43D;&#x444;&#x43E;&#x440;&#x43C;&#x430;&#x442;&#x438;&#x432;&#x43D;&#x44B;&#x435; &#x43E;&#x431;&#x44A;&#x435;&#x43A;&#x442;&#x44B;, &#x43A;&#x440;&#x430;&#x441;&#x43D;&#x430;&#x44F; &#x43E;&#x431;&#x43B;&#x430;&#x441;&#x442;&#x44C; &#x2014; &#x43D;&#x430;&#x438;&#x431;&#x43E;&#x43B;&#x435;&#x435; &#x438;&#x43D;&#x444;&#x43E;&#x440;&#x43C;&#x430;&#x442;&#x438;&#x432;&#x43D;&#x44B;&#x435; &#x43E;&#x431;&#x44A;&#x435;&#x43A;&#x442;&#x44B; &#x441;&#x43E;&#x433;&#x43B;&#x430;&#x441;&#x43D;&#x43E; &#x434;&#x430;&#x43D;&#x43D;&#x43E;&#x439; &#x441;&#x442;&#x440;&#x430;&#x442;&#x435;&#x433;&#x438;&#x438;" id="id" class="class" width="700">
+<p class="caption">Рис. 5: Тепловые карты различных <span class="math"><script type="math/tex">\varphi_k(x)</script></span> в случае трех классов. Синяя область — наименее информативные объекты, красная область — наиболее информативные объекты согласно данной стратегии</p>
+</div>
 </center>
 <p>Форму области красного цвета на каждом графике легко объяснить — для a) она имеет форму треугольника, так как значение функционала определяется вероятностью <span class="math"><script type="math/tex">P_{\theta}(y^*|x)</script></span>, для b) область сосредоточена вдоль перпендикуляров от центра треугольника, так как она соответствует равенству <span class="math"><script type="math/tex">P_{\theta}(y^*_1|x)</script></span> и <span class="math"><script type="math/tex">P_{\theta}(y^*_2|x)</script></span>. Что касается c), то в этом функционале учитываются все априорные вероятности, и если для точки <span class="math"><script type="math/tex">x</script></span> вероятность <span class="math"><script type="math/tex">P_{\theta}(y|x)</script></span> мала для некоторого <span class="math"><script type="math/tex">y</script></span> (такие <span class="math"><script type="math/tex">x</script></span> располагаются вдоль сторон), то эта точка не включатся в число информативных по стратегии c) (так как модель считает, что этот объект не относится к тому классу).</p>
 <h4 id="&#x441;&#x442;&#x440;&#x430;&#x442;&#x435;&#x433;&#x438;&#x44F;-2-&#x43E;&#x442;&#x431;&#x43E;&#x440;-&#x43A;&#x43E;&#x43C;&#x438;&#x442;&#x435;&#x442;&#x43E;&#x43C;-query-by-committee">Стратегия 2: отбор комитетом (query by committee)</h4>
@@ -487,8 +497,10 @@ pre.editor-colors .bracket-matcher .region,
 <h4 id="&#x441;&#x442;&#x440;&#x430;&#x442;&#x435;&#x433;&#x438;&#x44F;-3-&#x441;&#x43E;&#x43A;&#x440;&#x430;&#x449;&#x435;&#x43D;&#x438;&#x435;-&#x43F;&#x440;&#x43E;&#x441;&#x442;&#x440;&#x430;&#x43D;&#x441;&#x442;&#x432;&#x430;-&#x440;&#x435;&#x448;&#x435;&#x43D;&#x438;&#x439;-version-space-reduction">Стратегия 3: Сокращение пространства решений (version space reduction)</h4>
 <p>Идея этого подхода заключается в уменьшении пространствами решений (version space). Под пространством решений в общем случае понимают множество гипотез, которые согласуются с текущими тренировочными данными. Понятие получается довольно размытое, но в задаче классификации гипотезы <em>связаны</em> с всевозможными разделяющими гиперплоскостями и т.п.</p>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/vs.png?v=1480851541658" width="660"></p>
-<p><em><strong>Рис. 6: Примеры пространств решений</strong></em></p>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/vs.png?v=1480851541658" alt="&#x420;&#x438;&#x441;. 6: &#x41F;&#x440;&#x438;&#x43C;&#x435;&#x440;&#x44B; &#x43F;&#x440;&#x43E;&#x441;&#x442;&#x440;&#x430;&#x43D;&#x441;&#x442;&#x432; &#x440;&#x435;&#x448;&#x435;&#x43D;&#x438;&#x439;" id="id" class="class" width="660">
+<p class="caption">Рис. 6: Примеры пространств решений</p>
+</div>
 </center>
 <p>Поскольку пространство решений это очень широкое понятие, то стратегии его уменьшения можно описать только на примере конкретной задачи. Ниже приведен пример, как комбинируется SVM и активное обучение, и уменьшение пространства решений его ключевая идея.</p>
 <p>Стоит отметить, что отбор комитетом на самом деле тоже уменьшает пространство решений.</p>
@@ -518,8 +530,10 @@ pre.editor-colors .bracket-matcher .region,
 <p>Если предположить, что <span class="math"><script type="math/tex">\|x_i\| = 1</script></span>, то <span class="math"><script type="math/tex">\min_i y_i(\langle x_i, w \rangle - w_0) = \min_i |\langle w, y_i x_i\rangle - y_i w_0| = \min_i |\langle w, y_i x_i\rangle - y_i w_0|/\|y_ix_i\|</script></span>, а значит зазор между гиперплоскостями также равен минимальному расстоянию от <span class="math"><script type="math/tex">w</script></span> до гиперплоскости <span class="math"><script type="math/tex">\langle v, y_i x_i\rangle - y_i w_0 = 0</script></span> относительно <span class="math"><script type="math/tex">v</script></span>.</p>
 <p>Отсюда следует, что оптимальный параметр <span class="math"><script type="math/tex">w</script></span> — это центр гиперсферы наибольшего радиуса в <span class="math"><script type="math/tex">\mathcal{V}</script></span>, которая бы не пересекалась ни с одной из гиперплоскостей полном пространстве.</p>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/svm+al.png?v=1480851541658" width="550"></p>
-<p><em><strong>Рис. 7: Активное обучение в SVM</strong></em></p>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/svm+al.png?v=1480851541658" alt="&#x420;&#x438;&#x441;. 7: &#x410;&#x43A;&#x442;&#x438;&#x432;&#x43D;&#x43E;&#x435; &#x43E;&#x431;&#x443;&#x447;&#x435;&#x43D;&#x438;&#x435; &#x432; SVM" id="id" class="class" width="550">
+<p class="caption">Рис. 7: Активное обучение в SVM</p>
+</div>
 </center>
 <h4 id="&#x43E;&#x431;-&#x430;&#x43A;&#x442;&#x438;&#x432;&#x43D;&#x43E;&#x43C;-&#x43E;&#x431;&#x443;&#x447;&#x435;&#x43D;&#x438;&#x438;">Об активном обучении</h4>
 <p>Пусть также <span class="math"><script type="math/tex">\mathcal{V}_k^- = \mathcal{V}_k \cap \{w\,|\, \langle w, x\rangle < 0\}</script></span> и <span class="math"><script type="math/tex">\mathcal{V}_k^+ = \mathcal{V}_k \cap \{w\,|\, \langle w, x\rangle > 0\}</script></span>, где <span class="math"><script type="math/tex">\mathcal{V}_k</script></span> — это пространство решений после <span class="math"><script type="math/tex">k</script></span> итераций активного обучения. Другими словами, <span class="math"><script type="math/tex">\mathcal{V}_k^-</script></span> и <span class="math"><script type="math/tex">\mathcal{V}_k^+</script></span> — это пространства решений, если метка для <span class="math"><script type="math/tex">x</script></span> оказалась <span class="math"><script type="math/tex">-1</script></span> и <span class="math"><script type="math/tex">1</script></span> соответсвенно. Также за <span class="math"><script type="math/tex">\mathcal{V}_k(\ell)</script></span> обозначим пространство решений после <span class="math"><script type="math/tex">k</script></span> итераций активного обучения, который использует стратегию <span class="math"><script type="math/tex">\ell</script></span>.</p>
@@ -529,8 +543,10 @@ pre.editor-colors .bracket-matcher .region,
 <li><em>Simple Margin</em>. Теперь перебирая все неразмеченные объекты <span class="math"><script type="math/tex">x</script></span>, выберем тот, для которого соответсвующая гиперплоскость ближе всего к центру <span class="math"><script type="math/tex">w_k</script></span>. По отступлению выше такой <span class="math"><script type="math/tex">x_k</script></span> находится ближе всего к разделяющей гиперплоскости в пространстве объектов.</li>
 </ul>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/simplemargin.png?v=1480851541658" width="550"></p>
-<p><em><strong>Рис. 8: Simple Margin. (a) выбирается ближайшая гиперплоскость b. (b) выбирается ближайшая гиперплоскость a</strong></em></p>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/simplemargin.png?v=1480851541658" alt="&#x420;&#x438;&#x441;. 8: Simple Margin. (a) &#x432;&#x44B;&#x431;&#x438;&#x440;&#x430;&#x435;&#x442;&#x441;&#x44F; &#x431;&#x43B;&#x438;&#x436;&#x430;&#x439;&#x448;&#x430;&#x44F; &#x433;&#x438;&#x43F;&#x435;&#x440;&#x43F;&#x43B;&#x43E;&#x441;&#x43A;&#x43E;&#x441;&#x442;&#x44C; b. (b) &#x432;&#x44B;&#x431;&#x438;&#x440;&#x430;&#x435;&#x442;&#x441;&#x44F; &#x431;&#x43B;&#x438;&#x436;&#x430;&#x439;&#x448;&#x430;&#x44F; &#x433;&#x438;&#x43F;&#x435;&#x440;&#x43F;&#x43B;&#x43E;&#x441;&#x43A;&#x43E;&#x441;&#x442;&#x44C; a" id="id" class="class" width="550">
+<p class="caption">Рис. 8: Simple Margin. (a) выбирается ближайшая гиперплоскость b. (b) выбирается ближайшая гиперплоскость a</p>
+</div>
 </center>
 <p>Обозначим за <span class="math"><script type="math/tex">m_k</script></span> радиус гиперсферы. Рассмотрим неразмеченный объект <span class="math"><script type="math/tex">x</script></span>, <span class="math"><script type="math/tex">\mathcal{V}_k^-</script></span>, <span class="math"><script type="math/tex">\mathcal{V}_k^+</script></span> — подпространства в пространсве решений, соответствующие отрицательной и положительной метке <span class="math"><script type="math/tex">x</script></span>. Теперь обозначим за <span class="math"><script type="math/tex">m^-_k</script></span> и <span class="math"><script type="math/tex">m^+_k</script></span> радиусы вписанных в <span class="math"><script type="math/tex">\mathcal{V}_k^-</script></span> и <span class="math"><script type="math/tex">\mathcal{V}_k^+</script></span> сфер.</p>
 <ul>
@@ -538,8 +554,10 @@ pre.editor-colors .bracket-matcher .region,
 <li><p><em>Ratio Margin</em>. В этой стратегии ищется <span class="math"><script type="math/tex">\arg\max_x \min\{m^+/m^-, m^-/m^+\}</script></span>, она объясняется так же, как и стратегия MaxMin Margin.</p></li>
 </ul>
 <center>
-<p><img src="/home/ivanova/Documents/seminar2016/active_learning/img/maxminmargin.png?v=1480851541658" width="550"></p>
-<p><em><strong>Рис. 9: (a) MaxMin Margin — выбирается гиперплоскость b. (b) Ratio Margin — выбирается гиперплоскость e</strong></em></p>
+<div class="figure">
+<img src="/home/ivanova/Documents/seminar2016/active_learning/img/maxminmargin.png?v=1480851541658" alt="&#x420;&#x438;&#x441;. 9: (a) MaxMin Margin &#x2014; &#x432;&#x44B;&#x431;&#x438;&#x440;&#x430;&#x435;&#x442;&#x441;&#x44F; &#x433;&#x438;&#x43F;&#x435;&#x440;&#x43F;&#x43B;&#x43E;&#x441;&#x43A;&#x43E;&#x441;&#x442;&#x44C; b. (b) Ratio Margin &#x2014; &#x432;&#x44B;&#x431;&#x438;&#x440;&#x430;&#x435;&#x442;&#x441;&#x44F; &#x433;&#x438;&#x43F;&#x435;&#x440;&#x43F;&#x43B;&#x43E;&#x441;&#x43A;&#x43E;&#x441;&#x442;&#x44C; e" id="id" class="class" width="550">
+<p class="caption">Рис. 9: (a) MaxMin Margin — выбирается гиперплоскость b. (b) Ratio Margin — выбирается гиперплоскость e</p>
+</div>
 </center>
 <h2 id="&#x43D;&#x435;&#x434;&#x43E;&#x441;&#x442;&#x430;&#x442;&#x43A;&#x438;-&#x430;&#x43A;&#x442;&#x438;&#x432;&#x43D;&#x43E;&#x433;&#x43E;-&#x43E;&#x431;&#x443;&#x447;&#x435;&#x43D;&#x438;&#x44F;">Недостатки активного обучения</h2>
 <p>Стратегии активного обучения устроены так, что они рекомендуют точки, лежащие, например, вблизи разделяющей гиперплоскости в текущей модели. Это хорошо работает, если нет крупных областей, где модель бы ошибалась. Таким образом, у алгоритма среди данных есть необследованные участки, что повышается ошибку на тестовых данных.</p>
