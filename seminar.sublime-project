@@ -1,0 +1,33 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	
+	"build_systems": [
+		{
+			"name": "Markdown",
+			"variants": [
+				{
+					"name": "HTML",
+					"shell_cmd": "pandoc -f markdown -t html --filter pandoc-citeproc -s --smart --mathml --toc  $file -o $file_base_name.html"
+				},
+				{
+					"name": "LaTeX text",
+					"shell_cmd": "pandoc -f markdown -t latex --filter pandoc-citeproc -s --smart --template $project_path/commons/markdown_templates/russian.latex --toc --latex-engine=xelatex  $file -o $file_base_name.tex"
+				},
+				{
+					"name": "PDF text",
+					"shell_cmd": "pandoc -f markdown -t latex --filter pandoc-citeproc -s --smart --template $project_path/commons/markdown_templates/russian.latex --toc --latex-engine=xelatex  $file -o $file_base_name.pdf"
+				},
+				{
+					"name": "PDF presentation (Beamer)",
+					"shell_cmd": "pandoc -t beamer --template $project_path/commons/markdown_templates/russian.beamer -s --smart --filter pandoc-citeproc $file -o $file_base_name.pdf"
+				}
+			]
+		}
+
+	]
+}
