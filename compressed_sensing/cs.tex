@@ -26,6 +26,7 @@
 %\usepackage[T2A]{fontenc}
 \usepackage{amsmath}
 \usepackage{url}
+\usepackage{pgfplots}
 
 \usepackage{indentfirst}
 
@@ -64,7 +65,7 @@
 \maketitle
 \epigraph{The \textbf{data deluge} refers to the situation where the volume of new data being generated is overwhelming the capacity of institutions to manage it and researchers to make use of it.}
 
-\section{Introduction}
+\section{Motivational introduction}
 In the last decade the humanity has come to the point when it produces much more information than it can store and analyse.
 There is a huge exposion in the variety of sensors and their dimensionality in many areas: video, audio, scientific, medical research.
 Because of that we face the problem of \textbf{data deluge} and naturally come to the necessity of compressing data.
@@ -76,27 +77,42 @@ Because of that we face the problem of \textbf{data deluge} and naturally come t
     \caption{
         \label{fig:CSSampleCompressParadigm}
         ``Sample-Then-Compress Paradigm''.
-        Sample could be a digital camera, a microphone, \ldots. Compression strategy is signal-dependent.
+        Sample could be a digital camera, a microphone,~\ldots\, Compression strategy is signal-dependent.
     }
 \end{figure}
 Let us consider the so-called ``Sample-Then-Compress Paradigm'' (Fig~\ref{fig:CSSampleCompressParadigm}).
-We want to transmit a signal (it could be continuous), but are unable to do it with a whole signal.
-Thus, we sample it $n$ times.
-The transmission channel we use reduces the ``dimension'' of the sampled signal to $S \ll n$.
-Afterwards, the received compressed signal is decompressed to previous dimension which is equal to $n$.
-In this scenario $S$ is signal-nature-specific.
-First, with $S \ll n$ the process seems to be somewhat wasteful.
-Secondly, every sampling (measurement) could be exorbitant.
+We want to transmit a signal (it could be continuous, it does not matter at this point), but we are unable to do it.
+Instead we sample it $n$ times (we will say that the dimension of the sample is $n$).
+The transmission channel we reduce the dimension of the sampled signal to $S \ll n$.
+Afterwards, the received compressed signal is decompressed to previous dimension $n$.
+In this scenario $S$ depends on the nature of the signal.
+First, with $S \ll n$ the process seems to be somewhat wasteful: why do we actually need to do $n$ samples if we anyway compress in to the dimension of $S$?!
+Secondly, every measurement of total $n$ in a sample could be exorbitant.
 Thus, we want to reduce $n$ as much as it is possible.
 
+This example is not accurate as we will see, as follows.
+However, it demonstrates why people were concerned about Compressed Sensing in the first place.
 
+
+\section{Introduction to the Compressed Sensing idea}
 The idea of Compressed Sensing is that the signal at Fig.~\ref{fig:CSSampleCompressParadigm} that we would like to transmit/acquire is actually sparse (or ``approximately sparse'') signal in a certain ``basis''.
-Suppose that this signal is an $m$-dimensional vector.
-Then we want to find a linear basis in $\mathbb R^m$ for this vector to be $S$-sparse.
-The challenge of the problem is that we do not observe the signal explicitly (in any basis).
-We can make sampling (measurements) that are a certain transformation of the signal (for example, linear).
-Speaking non-formally, our aim is to reconstruct the signal making as few measurements as possible (to reduce $n$ at Fig.~\ref{fig:CSSampleCompressParadigm}).
-Without the assumption of the existence of the basis in which the original signal is sparse the problem would have a trivial solution: we would generally need to make as many measurements as is the dimension of a signal.
+Suppose that this signal is an $m$-dimensional vector, where $m$ is very large.
+Then we want to find a linear basis in $\mathbb R^m$ for this vector to be $S$-sparse (i.e. to have only $S$ nonzero components).
+The challenge of the problem is that we do not observe the whole signal.\footnote{
+    Suppose that we do.
+    Then we can use it as an orth in a basis and the signal is $1$-sparse.
+    However, we cannot observe the whole signal because $m$ is very large.
+    Take a look at Fig.\ref{fig:CSSampleCompressParadigm}.
+    If the signal is an $m$-dimensional vector, then to find the basis we would need to take $n := m$ samples.
+    But as we have already discussed we want to reduce $n$ as much as it is possible.
+    Because of that we want to find a basis of interest without observing the whole signal.
+}
+
+Let us suppose that we now deal with a $S$-sparse signal (we still do not observe it, but know that it is $S$-sparse).
+Our aim is to reconstruct the signal (think about decompressing at Fig.\ref{fig:CSSampleCompressParadigm}).
+We can make measurements that are a certain transformation of the signal (for example, linear).
+We want to make as few measurements as possible (to reduce $n$ at Fig.~\ref{fig:CSSampleCompressParadigm}).
+Without the assumption of us possessing the basis in which the original signal is sparse the problem would have a trivial solution: we would generally need to make as many measurements as is the dimension of a signal.\footnote{Think it through!}
 
 Generally speaking there are 2 distinct problems:
 \begin{itemize}
@@ -112,11 +128,11 @@ Our main concern will be the second problem: to find and quantify the minimal po
 \section{An example of Compressed Sensing sparsity}
 \label{sec:motivation}
 The main idea of the Compressed Sensing is that a signal vector of our interest is a \textbf{sparse} vector when represented in \textbf{some basis}.
-Technically speaking it could be not sparsity in a strict sense (when many components are zeros), but the approximately sparsity (when many components are close to zero).
+Technically speaking it could be approximately sparse when many components are close to zero.
 There are lots of non-formal examples demonstrating this idea, however, many of them are very difficult to formalize.
 We will stick to a very simple example that makes a connection with the time series theory.
 
-Let us consider a time series $x = \{x_n\}_{n=1}^N$.
+Let us consider time series $x = \{x_n\}_{n=1}^N$.
 The time series $x$ itself is very rarely a sparse vector, i.e. one would not rely on the assumption that $x_n = 0$ for many $n$-s.
 However, what could be assumed is that the periodogram has only a few peaks.
 Indeed, let us suppose for all $n \in 1:N$
@@ -125,6 +141,7 @@ where $w_i \in [0, 0.5]$ and $w_i \neq w_j$ for $i \neq j$.
 We will suppose that the length $N$ is multiple of the period of $x$.
 Then the periodogram will have peaks only at $w_i$.
 In this sense the \textbf{Fourier basis} is the basis in which $x$ is $S$-\textbf{sparse}.
+Note, that we do not need to know the whole series $x$ to be sure that we possess a basis in which the signal is $S$-sparse.
 
 If with previous assumptions 
 $$ x_n = \sum_{i=1}^k \sin\left(2 \pi w_i \frac{n}{N}\right) + \varepsilon_n, $$
@@ -136,7 +153,7 @@ In this sense the \textbf{Fourier basis} is the basis in which $x$ is \textbf{ap
 \section{Problem Statement}
 From now on we will only consider the problem of exact or approximate reconstruction of the signal observing a minimum possible number of measurements.
 
-We fix $m \in \mathbb N$ and will denote the signal $\beta^*$ and will suppose that $\beta^* \in \mathbb R^m$.
+We fix $m \in \mathbb N$. The signal is denoted $\beta^* \in \mathbb R^m$.
 We suppose that $\beta^*$ is (strictly) $S$-sparse (has only $S$ non-zero components).
 This will be denoted as $\|\beta^*\|_0 = S$.
 The $S$ itself is latent (not observed).
@@ -144,10 +161,10 @@ We also fix the set of design transformation matrices $\mathbf X_n \in \mathcal 
 The ``measurements'' are denoted $y_n \in \mathbb R^n$ for all $n \in \mathbb N$.
 The formal connection between $\beta^*$ and $y_n$ is made through the matrix $\mathbf X_n$ for all $n \in \mathbb N$ and will be explicitly stated.
 
-Let us note one more time that we are aware of $X_n$ for all $n$ and observe $y_n$, but do not observe $\beta^*$ and want to find it with the smallest $n$ possible.
+Let us note one more time that we are aware of $\mathbf X_n$ for all $n$ and observe $y_n$, but do not observe $\beta^*$ and want to find it with the smallest $n$ possible.
 
 \subsection{Noiseless case}
-Let us suppose that $y_n = X_n \beta^*$ for all $n \in \mathbb N$.
+Let us suppose that $y_n = \mathbf X_n \beta^*$ for all $n \in \mathbb N$.
 The problem is to obtain $\beta^*$ as the solution of the linear system $y_n = \mathbf X_n \beta$ (the variable $\beta$).
 The illustration can be seen at Fig.~\ref{fig:NoiseLessProblemStatement}.
 \begin{figure}[H]
@@ -171,7 +188,7 @@ We will now consider an example of the family $\{\mathbf X_n\}_{n \geqslant 1}$.
 
 \begin{definition}
     \label{def:rip}
-    A matrix $\mathbf A \in \mathcal M_{n, m}(\mathbb R)$ is said to satisfy the \textbf{restricted isometry property} of order $S$ with constant $\delta_S$ for $\delta_S \in (0, 1)$ if
+    A matrix $\mathbf A \in \mathcal M_{n, m}(\mathbb R)$ is said to satisfy the \textbf{restricted isometry property} (RIP) of order $S$ with constant $\delta_S$ for $\delta_S \in (0, 1)$ if
     $$ (1 - \delta_S) \|x\|_2^2 \leqslant \|\mathbf A x\|_2^2 \leqslant (1 + \delta_S) \|x\|_2^2 $$
     for all $S$-sparse $x \in \mathbb R^m$.
     
@@ -179,29 +196,48 @@ We will now consider an example of the family $\{\mathbf X_n\}_{n \geqslant 1}$.
 \end{definition}
 
 \begin{theorem}
+    \label{theorem:CSforRIP}
     Let $\mathbf X_n \in \mathcal M_{n, m} (\mathbb R)$ be $\textrm{RIP}(S, \delta)$ where $S \leq m / 2$ and $\delta \in (0, 1)$. Then for
-    $$ n \geqslant C_\delta S \log(m / S), $$
+    $$ n \geqslant C_\delta S \ln(m / S), $$
     where $C_\delta < 1$ is a constant and depends only on $\delta$:
     $$ \hat \beta_n = \beta. $$
 \end{theorem}
 Proof can be found in Theorem 3.5: \url{mdav.ece.gatech.edu/publications/phdthesis-2010.pdf}.
+Let us comment on the result of the theorem.
+Suppose, that $S$ is very small comparatively to $m$, then
+$$ C_\delta S \ln(m / S) = C_\delta S \ln m - C_\delta S \ln S \approx const \cdot \ln m. $$
+It means that we only need to make a number of samples proportional to $\ln m$ instead of $m$ when the assumption about the sparsity is not made.
+If $S = m / 2$ then
+$$ C_\delta S \ln(m / S) = (C_\delta m \ln 2) / 2 \approx const \cdot m. $$
+It means that we need to make a number of samples proportional to $m$.
+Consequently, the number of measurements is bounded between $\log m$ and $m$.
 
-It is an NP-problem to check whether the matrix satisfies RIP.
+The problem of checking the RIP condition for a given matrix is NP-hard.
 However, it is easy to simulate a matrix that satisfies RIP with a high probability.
 
 \begin{theorem}
     Fix $\delta \in (0, 1)$.
     Let $\mathbf X_n \in \mathcal M_{n, m} (\mathbb R)$ be a random matrix whose components are independent and have $\mathcal N(0, 1/n^2)$ distribution.
-    If for some $C_1 > 0$
-    $$ n \geqslant C_1 \log(m / S), $$
+    Fix $C_1 > 0$ such as
+    $$ n \geqslant C_1 \ln(m / S), $$
     then 
     $$ \mathbb P(\mathbf X_n \in \textrm{RIP}(S, \delta)) \geq 1 - 2 e^{-C_2 n}, $$
     where $C_2 = \delta^2/2C_1 - \ln (42 e / \delta) / C_1$.
 \end{theorem}
 Proof can be found in Theorem 4.3: \url{mdav.ece.gatech.edu/publications/phdthesis-2010.pdf}.
 
-Let us note that the RIP quality is not the only condition that allows to formulate such results.
-There are plenty of them, see Section 3.1.3: \url{https://sites.google.com/site/igorcarron2/cs}
+As we want to make the probability as high as possible, to produce RIP matrix we want $\exp(-C_2n)$ as small as possible.
+It means that $C_2 n$ as large as possible.
+Let's take $C_1$: $n = C_1 \ln(m / S)$:
+$$C_2 n = C_1 C_2 \ln(m / S) = \ln(m / S) [ \delta^2 / 2 - \ln(42 e / \delta) ] = \ln(m/S) [ \delta^2 / 2 + \ln \delta + const ]. $$
+So the probability we are interested in depends on $\delta$: the higher $\delta$ is --- the higher the probability is (with fixed $m$).
+Consider an extreme example of $\delta = 1$:
+$$ \mathbb P(\mathbf X_n \in \textrm{RIP}(S, \delta)) \geq 1 - 2 e^{-C_2 n} = 1 - 2 e^{ \ln{m/S}(0.5 + \ln(42))} \approx 1 - 2 e^{4.2 \ln(m/S)}. $$
+WTF???
+
+Let us note that the RIP quality is not the only condition that allows to formulate results similar to the theorem \ref{theorem:CSforRIP}.
+There are plenty of them, see Section 3.1.3: \url{https://sites.google.com/site/igorcarron2/cs}.
+RIP is somewhat the most traditional.
 
 \subsection{Noisy case}
 Let us suppose that $y_n = X_n \beta^* + \varepsilon_n$ for all $n \in \mathbb N$, where $\varepsilon_n$ is the noise.
