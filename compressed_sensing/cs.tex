@@ -65,14 +65,31 @@
 \maketitle
 \epigraph{The \textbf{data deluge} refers to the situation where the volume of new data being generated is overwhelming the capacity of institutions to manage it and researchers to make use of it.}
 
-\section{Motivational introduction}
+\section{Introduction}
 In the last decade the humanity has come to the point when it produces much more information than it can store and analyse.
 There is a huge exposion in the variety of sensors and their dimensionality in many areas: video, audio, scientific, medical research.
 Because of that we face the problem of \textbf{data deluge} and naturally come to the necessity of compressing data.
 
+The problem that we will consider can be calculated as follows.
+We want to transmit a signal (usually continuous), but we are unable to do it, because the transmission channel is quite narrow.
+What strategies can we come up with?
+
+Let us consider the so-called ``Sample-Then-Compress Paradigm'' (Fig~\ref{fig:CSSampleCompressParadigm}).
+We sample the signal $n$ times (vector in $\mathbb R^n$).
+The transmission channel is narrow, thus, we lossy compress the sample to the dimension $d \ll n$ (vector in $\mathbb R^d$).
+Afterwards, the received compressed signal is decompressed to previous dimension $n$.
+
+This strategy has a number of flaws.
+First, how big should $n$ be for us to recover the signal ``well enough'' and is it possible with the limitation of $d$?
+Secondly, with $d \ll n$ the process seems to be somewhat wasteful: why do we actually need many $n$ samples if we anyway compress in to the dimension $d$?!
+Thirdly, at which time points should we measure the signal?
+Fourthly, every measurement in the sample could be exorbitant.
+Thus, we want to reduce $n$ as much as it is possible.
+
+
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[width=.75\textwidth]{figures/CS_sample_compress_paradigm.pdf}
+        \includegraphics[width=.60\textwidth]{figures/CS_sample_compress_paradigm.pdf}
     \end{center}
     \caption{
         \label{fig:CSSampleCompressParadigm}
@@ -80,22 +97,14 @@ Because of that we face the problem of \textbf{data deluge} and naturally come t
         Sample could be a digital camera, a microphone,~\ldots\, Compression strategy is signal-dependent.
     }
 \end{figure}
-Let us consider the so-called ``Sample-Then-Compress Paradigm'' (Fig~\ref{fig:CSSampleCompressParadigm}).
-We want to transmit a signal (it could be continuous, it does not matter at this point), but we are unable to do it.
-Instead we sample it $n$ times (we will say that the dimension of the sample is $n$).
-The transmission channel we reduce the dimension of the sampled signal to $S \ll n$.
-Afterwards, the received compressed signal is decompressed to previous dimension $n$.
-In this scenario $S$ depends on the nature of the signal.
-First, with $S \ll n$ the process seems to be somewhat wasteful: why do we actually need to do $n$ samples if we anyway compress in to the dimension of $S$?!
-Secondly, every measurement of total $n$ in a sample could be exorbitant.
-Thus, we want to reduce $n$ as much as it is possible.
 
-This example is not accurate as we will see, as follows.
-However, it demonstrates why people were concerned about Compressed Sensing in the first place.
+\begin{center}
+    \bf \color{red} Maybe we can do better?
+\end{center}
 
-
-\section{Introduction to the Compressed Sensing idea}
-The idea of Compressed Sensing is that the signal at Fig.~\ref{fig:CSSampleCompressParadigm} that we would like to transmit/acquire is actually sparse (or ``approximately sparse'') signal in a certain ``basis''.
+\section{Compressed Sensing idea}
+The idea of Compressed Sensing is that the signal at Fig.~\ref{fig:CSSampleCompressParadigm} that we would like to transmit/acquire is often sparse (or ``approximately sparse'') signal in a certain ``basis''.
+We will consider a very small example in the section \ref{sec:motivation} that demonstrates that this assumption is feasible.
 Suppose that this signal is an $m$-dimensional vector, where $m$ is very large.
 Then we want to find a linear basis in $\mathbb R^m$ for this vector to be $S$-sparse (i.e. to have only $S$ nonzero components).
 The challenge of the problem is that we do not observe the whole signal.\footnote{
@@ -109,10 +118,13 @@ The challenge of the problem is that we do not observe the whole signal.\footnot
 }
 
 Let us suppose that we now deal with a $S$-sparse signal (we still do not observe it, but know that it is $S$-sparse).
-Our aim is to reconstruct the signal (think about decompressing at Fig.\ref{fig:CSSampleCompressParadigm}).
+Our aim is to transmit the signal.
 We can make measurements that are a certain transformation of the signal (for example, linear).
 We want to make as few measurements as possible (to reduce $n$ at Fig.~\ref{fig:CSSampleCompressParadigm}).
-Without the assumption of us possessing the basis in which the original signal is sparse the problem would have a trivial solution: we would generally need to make as many measurements as is the dimension of a signal.\footnote{Think it through!}
+Without the assumption of us possessing the basis in which the original signal is sparse the problem would have a trivial solution:
+we would generally need to make as many measurements as is the dimension of a signal.\footnote{Think it through!}
+But with the sparsity there is a chance that we need less measurements than the width of the transmission channel $d$
+to reconstruct the original signal exactly or approximately.
 
 Generally speaking there are 2 distinct problems:
 \begin{itemize}
@@ -122,8 +134,8 @@ Generally speaking there are 2 distinct problems:
 There are theoretical results yielding the minimum number of required measurements needed to produce the original signal given a specific measurement strategy.
 
 In these notes we will not consider the problem of finding the basis in which the signal can be decomposed in a sparse manner.
-We will only limit ourselves to a very small example given in the section \ref{sec:motivation} that demonstrates that this assumption is feasible.
-Our main concern will be the second problem: to find and quantify the minimal possible number of measurements to reconstruct the original signal.
+We will only limit ourselves to a very small example given in the section \ref{sec:motivation}.
+Our main concern will be the second problem.
 
 \section{An example of Compressed Sensing sparsity}
 \label{sec:motivation}
