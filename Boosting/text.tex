@@ -173,7 +173,7 @@ $b_T =  \underset{b  \in \mathcal{B}}{\arg\min} N(b;\tilde V_n)$, $\omega_T = \f
    \item $v_i := 1/n, i = 1,\dots,n$;
    \item для всех $t = 1,\dots,T$
    \item \quad обучить базовый алгоритм: $b_T =  \underset{b  \in \mathcal{B}}{\arg\min} N(b;V_n)$;
-   \item \quad $\omega_T = \frac{1}{2} \ln\frac{1 - N(b_T,\tilde V_n)}{N(b_T, V_n)}$;
+   \item \quad $\omega_T = \frac{1}{2} \ln\frac{1 - N(b_T,V_n)}{N(b_T, V_n)}$;
    \item \quad пересчитать веса объектов: $u_i := u_i \exp\{-\omega_t y_i b_t(x_i)\}, i = 1,\dots,n$;
    \item \quad нормировать веса объектов: $v_0 := \sum\limits_{j=1}^n v_i$; $v_i := v_i/v_0, i = 1,\dots,n$;
 \end{enumerate}
