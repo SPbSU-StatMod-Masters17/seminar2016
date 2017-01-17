@@ -160,9 +160,9 @@ $b_T =  \underset{b  \in \mathcal{B}}{\arg\max} \sqrt{P(b;\tilde V_n)} - \sqrt{N
 
 Пусть $b_t: X \mapsto \{-1;+1\}$. Тогда $P = 1 - N$.
 
-\textbf{Теорема 2(Freund, Schapire, 1995).} Пусть для любого нормированного вектора весов $ V_n$ существует алгоритм $b \in \mathcal{B}$: $N(b, V_n) < \frac{1}{2}$.
+\textbf{Теорема 2(Freund, Schapire, 1995).} Пусть для любого нормированного вектора весов $ U_n$ существует алгоритм $b \in \mathcal{B}$: $N(b, U_n) < \frac{1}{2}$.
 Тогда минимум функционала $\tilde Q_T$ достигается при 
-$b_T =  \underset{b  \in \mathcal{B}}{\arg\min} N(b;\tilde U_n)$, $\omega_T = \frac{1}{2} \ln\frac{1 - N(b_T,\tilde U_n)}{N(b_T,\tilde U_n)}$.
+$b_T =  \underset{b  \in \mathcal{B}}{\arg\min} N(b;\tilde V_n)$, $\omega_T = \frac{1}{2} \ln\frac{1 - N(b_T,\tilde V_n)}{N(b_T,\tilde V_n)}$.
 
 \subsection*{Алгоритм AdaBoost}
 
@@ -170,12 +170,12 @@ $b_T =  \underset{b  \in \mathcal{B}}{\arg\min} N(b;\tilde U_n)$, $\omega_T = \f
 
 {\bf {Выход}}: $\omega_t, b_t, t = 1,\dots,T$.
 \begin{enumerate}
-   \item $u_i := 1/n, i = 1,\dots,n$;
+   \item $v_i := 1/n, i = 1,\dots,n$;
    \item для всех $t = 1,\dots,T$
-   \item \quad обучить базовый алгоритм: $b_T =  \underset{b  \in \mathcal{B}}{\arg\min} N(b;\tilde U_n)$;
-   \item \quad $\omega_T = \frac{1}{2} \ln\frac{1 - N(b_T,\tilde U_n)}{N(b_T,\tilde U_n)}$;
+   \item \quad обучить базовый алгоритм: $b_T =  \underset{b  \in \mathcal{B}}{\arg\min} N(b;V_n)$;
+   \item \quad $\omega_T = \frac{1}{2} \ln\frac{1 - N(b_T,\tilde V_n)}{N(b_T, V_n)}$;
    \item \quad пересчитать веса объектов: $u_i := u_i \exp\{-\omega_t y_i b_t(x_i)\}, i = 1,\dots,n$;
-   \item \quad нормировать веса объектов: $u_0 := \sum\limits_{j=1}^n u_i$; $u_i := u_i/u_0, i = 1,\dots,n$;
+   \item \quad нормировать веса объектов: $v_0 := \sum\limits_{j=1}^n v_i$; $v_i := v_i/v_0, i = 1,\dots,n$;
 \end{enumerate}
 
 \section{Градиентный бустинг}
